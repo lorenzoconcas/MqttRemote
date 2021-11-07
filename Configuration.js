@@ -14,7 +14,7 @@ var config = {
         {
             state_handler: (request_type, data, callback) => { },
             state: "OFF",
-            name: "spegni",
+            name: "SpegniOS",
             deviceType: "switch",
             uuid: "4e8cb464-e2a9-48ee-9844-9376f499997a",
             icon: "mdi:refresh",
