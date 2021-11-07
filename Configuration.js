@@ -1,3 +1,4 @@
+import { spawn } from "child_process";
 var exec = require('child_process').exec;
 
 const device = {
@@ -12,7 +13,9 @@ var config = {
     device: device,
     "entities": [
         {
-            state_handler: (request_type, data, callback) => { },
+            state_handler: (request_type, data, callback) => {
+                const process = spawn("sh", ["-c", "echo lore | sudo -S bash -c 'poweroff'"]);
+             },
             state: "OFF",
             name: "SpegniOS",
             deviceType: "switch",
@@ -26,8 +29,7 @@ var config = {
                 let command = "cat /sys/class/thermal/thermal_zone0/temp"
                 exec(command, function (error, stdout, stderr) {
                     var r = parseInt(stdout) / 1000;
-                    console.log(r);
-                    callback(r);
+                    callback(r + " C");
                 });
             },
             statusUpdateInterval: 5000,
