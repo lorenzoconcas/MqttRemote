@@ -43,10 +43,13 @@ class MqttHandler {
 
             this.configuration.entities.forEach((e =>{
                 let deviceTopic = this.configuration.getDeviceStateTopic(e);
-                
+                let self = this;
                 setInterval(() => {
-                    e.state_handler("update", null, (data)=>{});
-                    this.mqttClient.publish(deviceTopic, e.state.toString());
+                    e.state_handler("update", null, (data)=>{
+                        self.mqttClient.publish(deviceTopic, data);
+                    
+                    });
+                   // this.mqttClient.publish(deviceTopic, e.state.toString());
                 }, 3000);
             }));
         }

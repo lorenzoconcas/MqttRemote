@@ -33,9 +33,9 @@ var config = {
             state_handler: (request_type, data, callback) => {
                 let command = "cat /sys/class/thermal/thermal_zone0/temp"
                 exec(command, function(error, stdout, stderr){
-                    var r  = parseInt(stdout) / 100;
+                    var r  = parseInt(stdout) / 1000;
                     console.log(r);
-                   // calback(stdout); 
+                    callback(r); 
                 });
              },
             state: 10,
