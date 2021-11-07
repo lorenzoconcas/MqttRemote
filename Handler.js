@@ -46,7 +46,7 @@ class MqttHandler {
                 let self = this;
                 setInterval(() => {
                     e.state_handler("update", null, (data)=>{
-                        self.mqttClient.publish(deviceTopic, data);
+                        self.mqttClient.publish(deviceTopic, data.toString());
                     
                     });
                    // this.mqttClient.publish(deviceTopic, e.state.toString());
