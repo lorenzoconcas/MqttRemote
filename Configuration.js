@@ -14,7 +14,9 @@ var config = {
     "entities": [
         {
             state_handler: (request_type, data, callback) => {
-                const process = spawn("sh", ["-c", "echo lore | sudo -S bash -c 'poweroff'"]);
+                if(request_type == "set"){
+                    const process = spawn("sh", ["-c", "echo lore | sudo -S bash -c 'poweroff'"]);
+                }
              },
             state: "OFF",
             name: "SpegniOS",

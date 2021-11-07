@@ -77,6 +77,7 @@ class MqttHandler {
             let r = new RegExp("homeassistant\/(\w+)\/("+this.configuration.device.name+")\/(\w+)\/set");
               if(topic.match(r)){
                   console.log(topic);
+                  
               }
             //    // if (topic == ) {
             //         console.log("COMANDO RICEVUTO", "->", message.toString());
