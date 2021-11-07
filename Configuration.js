@@ -7,6 +7,7 @@ const device = {
     "name": "berry",
     "sw_version": "0.0.0.1+035"
 };
+const statusUpdateInterval = 2000;
 var config = {
     device: device,
     "entities": [
@@ -17,29 +18,21 @@ var config = {
             deviceType: "switch",
             uuid: "4e8cb464-e2a9-48ee-9844-9376f499997a",
             icon: "mdi:refresh",
-
-        },
-        {
-            state_handler: (request_type, data, callback) => { },
-            state: "OFF",
-            name: "accendi",
-            deviceType: "switch",
-            uuid: "4e8cb464-e2a9-48ee-9844-9376f494997b",
-            icon: "mdi:refresh",
-
+            statusUpdateInterval,
         },
 
         {
             state_handler: (request_type, data, callback) => {
                 let command = "cat /sys/class/thermal/thermal_zone0/temp"
-                exec(command, function(error, stdout, stderr){
-                    var r  = parseInt(stdout) / 1000;
+                exec(command, function (error, stdout, stderr) {
+                    var r = parseInt(stdout) / 1000;
                     console.log(r);
-                    callback(r); 
+                    callback(r);
                 });
-             },
+            },
+            statusUpdateInterval: 5000,
             state: 10,
-            name: "tempcpu",
+            name: "TemperaturaCPU",
             deviceType: "sensor",
             uuid: "4e8cb464-e2a9-48ee-9844-9376f763497c",
             icon: "mdi:temperature-celsius",

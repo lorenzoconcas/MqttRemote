@@ -33,7 +33,7 @@ class MqttHandler {
         this.updateAvailability = () => {          
             this.configuration.entities.forEach((e =>{
                 let deviceTopic = this.configuration.getDeviceAvailabilityTopic(e);
-                console.log(deviceTopic);
+                
                 setInterval(() => {
                     this.mqttClient.publish(deviceTopic, "online");
                 }, 3000);
@@ -50,7 +50,7 @@ class MqttHandler {
                     
                     });
                    // this.mqttClient.publish(deviceTopic, e.state.toString());
-                }, 3000);
+                }, e.statusUpdateInterval);
             }));
         }
         this.announce = () => {
