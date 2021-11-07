@@ -31,7 +31,7 @@ var config = {
                 let command = "cat /sys/class/thermal/thermal_zone0/temp"
                 exec(command, function (error, stdout, stderr) {
                     var r = parseInt(stdout) / 1000;
-                    callback(r + " C");
+                    callback(r);
                 });
             },
             statusUpdateInterval: 5000,
@@ -40,6 +40,10 @@ var config = {
             deviceType: "sensor",
             uuid: "4e8cb464-e2a9-48ee-9844-9376f763497c",
             icon: "mdi:temperature-celsius",
+            customAttributes:[
+                ["state_class", "total"],
+                ["device_class", "temperature"]
+            ]
         }
     ],
     getDeviceConfigTopic: (d) => {
@@ -70,6 +74,11 @@ var config = {
         }
         if (type == "switch")
             data["command_topic"] = "homeassistant/" + type + "/" + deviceName + "/" + name + "/set";
+        if(d.customAttributes){
+            d.customAttributes.forEach((e)=>{
+                data[e[0]] = e[1];
+            })
+        }
         return data;
     }
 };
