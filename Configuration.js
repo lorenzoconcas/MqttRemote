@@ -1,6 +1,6 @@
 var spawn = require("child_process").spawn;
 var exec = require('child_process').exec;
-
+var utils = require("./Utils");
 const device = {
     "identifiers": "hass-berry",
     "manufacturer": "Raspberry Ltd",
@@ -14,15 +14,15 @@ var config = {
     "entities": [
         {
             state_handler: (request_type, data, callback) => {
-                if(request_type == "set"){
+                if (request_type == "set") {
                     const process = spawn("sh", ["-c", "echo lore | sudo -S bash -c 'poweroff'"]);
                 }
-             },
+            },
             state: "OFF",
             name: "SpegniOS",
             deviceType: "switch",
             uuid: "4e8cb464-e2a9-48ee-9844-9376f499997a",
-            icon: "mdi:refresh",
+            icon: "mdi:power",
             statusUpdateInterval,
         },
 
@@ -31,7 +31,7 @@ var config = {
                 let command = "cat /sys/class/thermal/thermal_zone0/temp"
                 exec(command, function (error, stdout, stderr) {
                     var r = parseInt(stdout) / 1000;
-                    callback(r);
+                    callback(Math.round((r + Number.EPSILON) * 100) / 100);
                 });
             },
             statusUpdateInterval: 5000,
@@ -40,11 +40,93 @@ var config = {
             deviceType: "sensor",
             uuid: "4e8cb464-e2a9-48ee-9844-9376f763497c",
             icon: "mdi:temperature-celsius",
-            customAttributes:[
+            customAttributes: [
                 ["state_class", "total"],
-                ["device_class", "temperature"]
+                ["device_class", "temperature"],
+                ["unit_of_measurement", "°C"]
             ]
-        }
+        },
+        {
+            state_handler: (request_type, data, callback) => {
+                if (request_type == "set") {
+                    console.log("Requested program exit");
+                    process.exit(0);
+                }
+            },
+            statusUpdateInterval: 5000,
+            state: 10,
+            name: "ChiudiMqttSender",
+            deviceType: "switch",
+            uuid: "4e8cb464-e2a9-48ee-9844-9376f763497d",
+            icon: "mdi:eject",
+
+        },
+        {
+            state_handler: async (request_type, data, callback) => {
+                // let command = "cat /proc/meminfo"
+                // let memory = {};
+                // exec(command, function (error, stdout, stderr) {
+                //     let rows = stdout.split("\n");
+                //     rows.forEach((r) => {
+                //         let r_split = r.split(":");
+                //         if (r_split[0] && r_split[1])
+                //             memory[r_split[0].trim()] = r_split[1].trim();
+                //     });
+                //     let free_mem_percentage = parseInt(memory['MemAvailable'].replace("kB")) * 100 / parseInt(memory['MemTotal'].replace("kB"));
+                //     //console.log(free_mem_percentage);
+                //     callback(Math.round((free_mem_percentage + Number.EPSILON) * 100) / 100);
+                // });
+
+                utils.ramSpace((memory) => {
+                    let avail = memory['MemAvailable'].toString().replace("kB", "");
+                    let total = memory['MemTotal'].toString().replace("kB", "");
+                    let free_mem_percentage = parseInt(avail) * 100 / parseInt(total);
+                    //console.log(free_mem_percentage);
+                    callback(Math.round((free_mem_percentage + Number.EPSILON) * 100) / 100);
+
+                });
+            },
+
+            statusUpdateInterval: 5000,
+            state: 10,
+            name: "RamLibera",
+            deviceType: "sensor",
+            uuid: "4e8cb464-e2a9-48ee-9844-9376f763497e",
+            icon: "mdi:memory",
+
+        }, {
+            state_handler: (request_type, data, callback) => {
+            
+                utils.diskSpace((memory)=>{
+                    callback(memory['/dev/sda2'].use_precentage.replace("%", ""))
+                });
+            
+
+            },
+            statusUpdateInterval: 5000,
+            state: 10,
+            name: "SpazioDisco",
+            deviceType: "sensor",
+            uuid: "4e8cb464-e2a9-48ee-9844-9376f763497f",
+            icon: "mdi:memory",
+
+        },{
+            state_handler: (request_type, data, callback) => {
+            
+                utils.upTime((value)=>{
+                    callback(value)
+                });
+            
+
+            },
+            statusUpdateInterval: 5000,
+            state: 10,
+            name: "UpTime",
+            deviceType: "sensor",
+            uuid: "4e8cb464-e2a9-48ee-9844-9376f763497g",
+            icon: "mdi:clock",
+
+        },
     ],
     getDeviceConfigTopic: (d) => {
         return "homeassistant/" + d.deviceType + "/" + device.name + "/" + d.name + "/config";
@@ -74,8 +156,8 @@ var config = {
         }
         if (type == "switch")
             data["command_topic"] = "homeassistant/" + type + "/" + deviceName + "/" + name + "/set";
-        if(d.customAttributes){
-            d.customAttributes.forEach((e)=>{
+        if (d.customAttributes) {
+            d.customAttributes.forEach((e) => {
                 data[e[0]] = e[1];
             })
         }

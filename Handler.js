@@ -58,7 +58,7 @@ class MqttHandler {
             this.configuration.entities.forEach((e => {
                 let deviceTopic = this.configuration.getDeviceConfigTopic(e);
                 let deviceData = this.configuration.getEntryConfig(e);
-                
+
                 setTimeout(() => {
                     this.mqttClient.publish(
                         deviceTopic,
@@ -88,7 +88,9 @@ class MqttHandler {
                 });
                 if (e) {
                     e.state_handler("set", message, (data) => {
-                        self.configuration.entities[indx].state = data;
+                        if (data)
+                            self.configuration.entities[indx].state = data;
+                        
                     })
                 }
             }
